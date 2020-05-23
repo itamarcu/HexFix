@@ -1,0 +1,15 @@
+{
+    "name": "hex-fix",
+    "title": "Hex Fix - Centers Tokens for Hex Maps",
+    "description": "This makes tokens snap to the center of hexes, instead of the corners of the squares containing them.",
+    "author": "Shemetz",
+    "version": "1.0.0",
+    "compatibleCoreVersion": "0.6.0",
+    "scripts": ["hexfix.js"],
+    "minimumCoreVersion": "0.6.0",
+    "url": "TODO",
+    "manifest": "TODO",
+    "download": "TODO",
+    "readme": "TODO",
+    "license": "TODO"
+}
