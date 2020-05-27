@@ -8,8 +8,6 @@
     "scripts": ["hexfix.js"],
     "minimumCoreVersion": "0.6.0",
     "url": "TODO",
-    "manifest": "https://github.com/itamarcu/HexFix/blob/master/module.json",
-    "download": "TODO",
-    "readme": "TODO",
-    "license": "TODO"
+    "manifest": "https://raw.githubusercontent.com/itamarcu/HexFix/master/module.json",
+    "readme": "https://raw.githubusercontent.com/itamarcu/HexFix/master/Readme.md",
 }
