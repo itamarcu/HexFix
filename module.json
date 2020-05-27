@@ -9,5 +9,6 @@
     "minimumCoreVersion": "0.6.0",
     "url": "https://github.com/itamarcu/HexFix",
     "manifest": "https://raw.githubusercontent.com/itamarcu/HexFix/master/module.json",
-    "readme": "https://raw.githubusercontent.com/itamarcu/HexFix/master/Readme.md"
+    "readme": "https://raw.githubusercontent.com/itamarcu/HexFix/master/Readme.md",
+    "download": "https://raw.githubusercontent.com/itamarcu/HexFix/master/HexFix.zip"
 }
