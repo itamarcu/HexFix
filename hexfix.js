@@ -91,7 +91,6 @@ _onDragLeftDrop_Fixed = (event) => {
 };
 
 Hooks.on("ready", function() {
-
-
+    Token.prototype._onDragLeftDrop = _onDragLeftDrop_Fixed;
     console.log("HexFix is done setting up!");
 });
