@@ -7,7 +7,7 @@
     "compatibleCoreVersion": "0.6.0",
     "scripts": ["hexfix.js"],
     "minimumCoreVersion": "0.6.0",
-    "url": "TODO",
+    "url": "https://github.com/itamarcu/HexFix",
     "manifest": "https://raw.githubusercontent.com/itamarcu/HexFix/master/module.json",
     "readme": "https://raw.githubusercontent.com/itamarcu/HexFix/master/Readme.md",
 }
