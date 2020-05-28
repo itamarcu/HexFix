@@ -3,7 +3,7 @@
     "title": "Hex Fix - Centers Tokens for Hex Maps",
     "description": "This makes tokens snap to the center of hexes, instead of the corners of the squares containing them.",
     "author": "Shemetz",
-    "version": "1.0.0",
+    "version": "0.3.8",
     "compatibleCoreVersion": "0.6.0",
     "scripts": ["hexfix.js"],
     "minimumCoreVersion": "0.6.0",
