@@ -140,8 +140,31 @@ function _getShiftedPosition_Fixed(dx, dy) {
     return collide ? {x: this.data.x, y: this.data.y} : {x, y};
 }
 
+/**
+ * Will now zoom around cursor.
+ */
+function _onMouseWheel_Fixed(event) {
+    let dz = ( event.deltaY < 0 ) ? 1.05 : 0.95;
+    const scale = dz * canvas.stage.scale.x;
+    const d = canvas.dimensions;
+    const max = CONFIG.Canvas.maxZoom;
+    const ratio = Math.max(d.width / window.innerWidth, d.height / window.innerHeight, max);
+    if (scale > ratio || scale < 1/ratio) {
+        console.log(`scale limit reached (${scale}).`)
+        return
+    }
+    // Acquire the cursor position transformed to Canvas coordinates
+    const t = canvas.stage.worldTransform;
+    const dx = ((-t.tx + event.clientX)/canvas.stage.scale.x - canvas.stage.pivot.x) * (dz - 1);
+    const dy = ((-t.ty + event.clientY)/canvas.stage.scale.y - canvas.stage.pivot.y) * (dz - 1);
+    const x = canvas.stage.pivot.x + dx;
+    const y = canvas.stage.pivot.y + dy;
+    canvas.pan({x, y, scale});
+}
+
 Hooks.on("init", function () {
     Token.prototype._onDragLeftDrop = _onDragLeftDrop_Fixed;
     Token.prototype._getShiftedPosition = _getShiftedPosition_Fixed;
+    Canvas.prototype._onMouseWheel = _onMouseWheel_Fixed;
     console.log("HexFix is done setting up!");
 });
