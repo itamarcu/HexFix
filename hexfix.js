@@ -62,6 +62,9 @@ function pixel_to_hex_to_pixel_but_hex_centered(point) {
     return {x: newx, y: newy}
 }
 
+/**
+ * Will center tokens around hexagons centers correctly
+ */
 function _onDragLeftDrop_Fixed(event) {
     const clones = event.data.clones || [];
     const updates = clones.reduce((updates, c) => {
@@ -100,36 +103,33 @@ function _onDragLeftDrop_Fixed(event) {
     return canvas.scene.updateEmbeddedEntity(this.constructor.name, updates);
 }
 
+/**
+ * Will no longer snap tokens to grid when moving them with WASD; also, will move diagonals hexagonally.
+ *
+ * Will "skip" hexagons when going left or right (i.e. in \A/B\C/ it will move from A to C)
+ */
 function _getShiftedPosition_Fixed(dx, dy) {
-    // HEXFIX
-    // it still checks collision, but no longer snaps anything anywhere. also, it moves in correct directions now.
-    let verticalFlipFlop = this.data.verticalFlipFlop; // true = down;
-    if (typeof(verticalFlipFlop) === "undefined") {
-        verticalFlipFlop = true;
-    }
     let change = {x: 0, y: 0};
     if (dx === 0 && dy < 0) { // ↑
         change = {x: 0, y: -1};
-    } else if ((dx > 0 && dy < 0) || (!verticalFlipFlop && dx > 0 && dy === 0)) { // ↗ →
+    } else if (dx > 0 && dy < 0) { // ↗
         change = {x: +0.75, y: -0.5};
-        verticalFlipFlop = !verticalFlipFlop;
-    } else if ((dx > 0 && dy > 0) || (verticalFlipFlop && dx > 0 && dy === 0)) { // ↘ →
+    } else if (dx > 0 && dy === 0) { // → ("skips" a hex)
+        change = {x: +1.5, y: 0};
+    } else if (dx > 0 && dy > 0) { // ↘
         change = {x: +0.75, y: +0.5};
-        verticalFlipFlop = !verticalFlipFlop;
     } else if (dx === 0 && dy > 0) { // ↓
         change = {x: 0, y: +1};
-    } else if ((dx < 0 && dy > 0) || (verticalFlipFlop && dx < 0 && dy === 0)) { // ↙ ←
+    } else if (dx < 0 && dy > 0) { // ↙
         change = {x: -0.75, y: +0.5};
-        verticalFlipFlop = !verticalFlipFlop;
-    } else if ((dx < 0 && dy < 0) || (!verticalFlipFlop && dx < 0 && dy === 0)) { // ↖ ←
+    } else if (dx < 0 && dy === 0) { // ← ("skips" a hex)
+        change = {x: -1.5, y: 0};
+    } else if (dx < 0 && dy < 0) { // ↖
         change = {x: -0.75, y: -0.5};
-        verticalFlipFlop = !verticalFlipFlop;
     } else {
         console.error("what the heck? are you in 3D space? you can't move in...", dx, dy);
         return
     }
-    this.data.verticalFlipFlop = verticalFlipFlop;
-    this.update({"verticalFlipFlop": verticalFlipFlop});
     const x = this.data.x + change.x * grid_width;
     const y = this.data.y + change.y * grid_height;
     const targetCenter = {
