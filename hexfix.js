@@ -70,8 +70,8 @@ function _onDragLeftDrop_Fixed(event) {
         let dest = {x: c.data.x, y: c.data.y};
         if (!event.data.originalEvent.shiftKey) {
             // HEXFIX
-            const halfWidth = c.data.width/2 * grid_width;
-            const halfHeight = c.data.height/2 * grid_height;
+            const halfWidth = c.data.width / 2 * grid_width;
+            const halfHeight = c.data.height / 2 * grid_height;
             const draggedCenter = {
                 x: c.data.x + halfWidth,
                 y: c.data.y + halfHeight,
@@ -101,16 +101,42 @@ function _onDragLeftDrop_Fixed(event) {
 }
 
 function _getShiftedPosition_Fixed(dx, dy) {
-    let [x, y] = canvas.grid.grid.shiftPosition(this.data.x, this.data.y, dx, dy);
-    let targetCenter = this.getCenter(x, y);
-    let collide = this.checkCollision(targetCenter);
     // HEXFIX
-    // If token is not aligned with grid, keep same "misalignment".
-    // This way, smaller centered tokens will remain centered!
-    let snapped = canvas.grid.getSnappedPosition(this.data.x, this.data.y);
-    x += this.data.x - snapped.x;
-    y += this.data.y - snapped.y;
-    //
+    // it still checks collision, but no longer snaps anything anywhere. also, it moves in correct directions now.
+    let verticalFlipFlop = this.data.verticalFlipFlop; // true = down;
+    if (typeof(verticalFlipFlop) === "undefined") {
+        verticalFlipFlop = true;
+    }
+    let change = {x: 0, y: 0};
+    if (dx === 0 && dy < 0) { // ↑
+        change = {x: 0, y: -1};
+    } else if ((dx > 0 && dy < 0) || (!verticalFlipFlop && dx > 0 && dy === 0)) { // ↗ →
+        change = {x: +0.75, y: -0.5};
+        verticalFlipFlop = !verticalFlipFlop;
+    } else if ((dx > 0 && dy > 0) || (verticalFlipFlop && dx > 0 && dy === 0)) { // ↘ →
+        change = {x: +0.75, y: +0.5};
+        verticalFlipFlop = !verticalFlipFlop;
+    } else if (dx === 0 && dy > 0) { // ↓
+        change = {x: 0, y: +1};
+    } else if ((dx < 0 && dy > 0) || (verticalFlipFlop && dx < 0 && dy === 0)) { // ↙ ←
+        change = {x: -0.75, y: +0.5};
+        verticalFlipFlop = !verticalFlipFlop;
+    } else if ((dx < 0 && dy < 0) || (!verticalFlipFlop && dx < 0 && dy === 0)) { // ↖ ←
+        change = {x: -0.75, y: -0.5};
+        verticalFlipFlop = !verticalFlipFlop;
+    } else {
+        console.error("what the heck? are you in 3D space? you can't move in...", dx, dy);
+        return
+    }
+    this.data.verticalFlipFlop = verticalFlipFlop;
+    this.update({"verticalFlipFlop": verticalFlipFlop});
+    const x = this.data.x + change.x * grid_width;
+    const y = this.data.y + change.y * grid_height;
+    const targetCenter = {
+        x: x + this.data.width / 2 * grid_width,
+        y: y + this.data.height / 2 * grid_height,
+    };
+    const collide = this.checkCollision(targetCenter);
     return collide ? {x: this.data.x, y: this.data.y} : {x, y};
 }
 
