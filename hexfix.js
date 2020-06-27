@@ -1,10 +1,13 @@
 console.log("HexFix is setting up...");
 
-// I am lazy so these constants assume a flat hex map of size 100
-const grid_size = 100;
-const hex_side = grid_size / 2; // length of each of the six sides
-const grid_width = grid_size; // width from left to right (point to point)
-const grid_height = grid_size * Math.sqrt(3) / 2; // height from top to bottom (flat to flat)
+let grid_size, hex_side, grid_width, grid_height;
+
+function updateGridSize(newGridSize) {
+    grid_size = newGridSize;
+    hex_side = grid_size / 2; // length of each of the six sides
+    grid_width = grid_size; // width from left to right (point to point)
+    grid_height = grid_size * Math.sqrt(3) / 2; // height from top to bottom (flat to flat)
+}
 
 function cube_round(cube) {
     let rx = Math.round(cube.x);
@@ -140,31 +143,23 @@ function _getShiftedPosition_Fixed(dx, dy) {
     return collide ? {x: this.data.x, y: this.data.y} : {x, y};
 }
 
-/**
- * Will now zoom around cursor.
- */
-function _onMouseWheel_Fixed(event) {
-    let dz = ( event.deltaY < 0 ) ? 1.05 : 0.95;
-    const scale = dz * canvas.stage.scale.x;
-    const d = canvas.dimensions;
-    const max = CONFIG.Canvas.maxZoom;
-    const ratio = Math.max(d.width / window.innerWidth, d.height / window.innerHeight, max);
-    if (scale > ratio || scale < 1/ratio) {
-        console.log(`scale limit reached (${scale}).`)
-        return
-    }
-    // Acquire the cursor position transformed to Canvas coordinates
-    const t = canvas.stage.worldTransform;
-    const dx = ((-t.tx + event.clientX)/canvas.stage.scale.x - canvas.stage.pivot.x) * (dz - 1);
-    const dy = ((-t.ty + event.clientY)/canvas.stage.scale.y - canvas.stage.pivot.y) * (dz - 1);
-    const x = canvas.stage.pivot.x + dx;
-    const y = canvas.stage.pivot.y + dy;
-    canvas.pan({x, y, scale});
-}
+let original_onDragLeftDrop, original_getShiftedPosition
 
 Hooks.on("init", function () {
-    Token.prototype._onDragLeftDrop = _onDragLeftDrop_Fixed;
-    Token.prototype._getShiftedPosition = _getShiftedPosition_Fixed;
-    Canvas.prototype._onMouseWheel = _onMouseWheel_Fixed;
+    original_onDragLeftDrop = Token.prototype._onDragLeftDrop;
+    original_getShiftedPosition = Token.prototype._getShiftedPosition;
     console.log("HexFix is done setting up!");
+});
+
+Hooks.on("canvasReady", function (newCanvas) {
+    if (newCanvas.grid.grid.columns && newCanvas.grid.grid.even) {
+        updateGridSize(newCanvas.grid.grid.w);
+        Token.prototype._onDragLeftDrop = _onDragLeftDrop_Fixed;
+        Token.prototype._getShiftedPosition = _getShiftedPosition_Fixed;
+        console.log("HexFix | enabled");
+    } else {
+        Token.prototype._onDragLeftDrop = original_onDragLeftDrop;
+        Token.prototype._getShiftedPosition = original_getShiftedPosition;
+        console.log("HexFix | disabled (not a nice hex grid)");
+    }
 });
